@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>涨跌停与保证金试算 v1.0</title><style>
+:root { --ink:#1F2933; --gray:#616E7C; --line:#D9DEE5; --blue:#2D6CB5; --bg:#F5F7FA; --red:#C53030; }
+* { box-sizing: border-box; }
+body { margin: 0; font: 15px/1.6 -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; color: var(--ink); background: var(--bg); }
+header { background: #fff; border-bottom: 1px solid var(--line); padding: 16px 28px; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+header h1 { font-size: 22px; margin: 0; }
+header .ver { font: 600 13px/1 ui-monospace, Menlo, monospace; color: #fff; background: var(--blue); padding: 5px 9px; border-radius: 4px; }
+header .sub { color: var(--gray); font-size: 13px; }
+main { max-width: 1080px; margin: 24px auto; padding: 0 20px; display: grid; grid-template-columns: 320px 1fr; gap: 20px; }
+@media (max-width: 760px) { main { grid-template-columns: 1fr; } }
+.card { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; }
+.card h2 { font-size: 16px; margin: 0 0 12px; }
+label { display: block; font-size: 13px; color: var(--gray); margin: 12px 0 4px; }
+select, input { width: 100%; font: inherit; padding: 7px 9px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+button { margin-top: 18px; width: 100%; font: 600 15px/1 inherit; padding: 11px; border: 0; border-radius: 6px; background: var(--blue); color: #fff; cursor: pointer; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.kv { background: var(--bg); border-radius: 8px; padding: 10px 12px; }
+.kv b { display: block; font-size: 12px; color: var(--gray); font-weight: 500; }
+.kv span { font: 600 20px/1.4 ui-monospace, Menlo, monospace; }
+.steps { margin: 12px 0 0; padding-left: 18px; color: var(--gray); font-size: 13px; }
+.err { color: var(--red); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+td, th { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+th { color: var(--gray); font-weight: 500; }
+footer { max-width: 1080px; margin: 0 auto 30px; padding: 0 20px; color: var(--gray); font-size: 12px; }
+</style></head>
+<body>
+<header><h1>涨跌停与保证金试算</h1><span class="ver">v1.0</span><span class="sub">按日期查当天的涨跌停价，按当日结算价试算交易保证金</span></header>
+<main>
+  <section class="card">
+    <h2>输入</h2>
+    <label for="c">合约</label><select id="c"><option>CU2607</option><option>CU2608</option><option>CU2609</option><option>CU2612</option><option>CU2702</option><option>CU2703</option></select>
+    <label for="d">日期</label><select id="d"><option>2026-06-29</option><option>2026-06-30</option><option>2026-07-01</option><option selected>2026-07-02</option><option>2026-07-03</option><option>2026-07-06</option></select>
+    
+    <label for="k">持仓类型</label><select id="k"><option value="一般">一般持仓</option><option value="套保">套期保值持仓</option></select>
+    <label for="n">手数</label><input id="n" type="number" min="1" value="4">
+    <button id="go">试算</button>
+  </section>
+  <section>
+    <div class="card"><h2>下单检查：涨跌停价</h2><div class="grid" id="lim"></div></div>
+    <div class="card" style="margin-top:16px"><h2>收盘结算：交易保证金</h2><div class="grid" id="mar"></div></div>
+    <div class="card" style="margin-top:16px"><h2>计算过程</h2><ol class="steps" id="steps"></ol></div>
+    <div class="card" style="margin-top:16px"><h2>在用的参数通知</h2><table id="nt"></table></div>
+  </section>
+</main>
+<footer>v1.0　结算价与持仓为教学数值；规则以交易所现行文本为准。参数只在代码顶部的“数据”区修改。</footer>
+<script>
+// ===== 数据：参数只在这里改 =====
+const SPEC = { CU: { 名称: '阴极铜', 交易单位: 5, 最小变动价位: 10 } };   // 5 吨/手，10 元/吨
+
+// 结算价（教学数值，不是真实行情），元/吨
+const SETTLE = {
+  "CU2607": {
+    "2026-06-26": 78050,
+    "2026-06-29": 78100,
+    "2026-06-30": 78200,
+    "2026-07-01": 78260,
+    "2026-07-02": 78300,
+    "2026-07-03": 78900
+  },
+  "CU2608": {
+    "2026-06-26": 78120,
+    "2026-06-29": 78180,
+    "2026-06-30": 78280,
+    "2026-07-01": 78330,
+    "2026-07-02": 78350,
+    "2026-07-03": 78960
+  },
+  "CU2609": {
+    "2026-06-26": 78170,
+    "2026-06-29": 78230,
+    "2026-06-30": 78330,
+    "2026-07-01": 78390,
+    "2026-07-02": 78410,
+    "2026-07-03": 79010
+  },
+  "CU2612": {
+    "2026-06-26": 78290,
+    "2026-06-29": 78350,
+    "2026-06-30": 78440,
+    "2026-07-01": 78500,
+    "2026-07-02": 78520,
+    "2026-07-03": 79100
+  },
+  "CU2702": {
+    "2026-06-26": 78360,
+    "2026-06-29": 78420,
+    "2026-06-30": 78510,
+    "2026-07-01": 78570,
+    "2026-07-02": 78590,
+    "2026-07-03": 79180
+  },
+  "CU2703": {
+    "2026-06-26": 78380,
+    "2026-06-29": 78440,
+    "2026-06-30": 78530,
+    "2026-07-01": 78580,
+    "2026-07-02": 78600,
+    "2026-07-03": 79200
+  }
+};
+
+const HOLIDAYS = ['2026-06-19'];
+
+// 交易所参数调整通知。比例用万分数：800 表示 8%。
+// 合约从、合约到为空，表示该品种全部合约。
+const NOTICES = [
+  { 编号: 'BASE-2026H1', 标题: '2026 年上半年执行的铜期货参数', 品种: 'CU', 合约从: null, 合约到: null,
+    生效日: '2026-01-22', 涨跌停板: 800, 一般持仓: 1000, 套保持仓: 900 },
+];
+
+// 《风险控制管理办法》第五条表一：铜期货合约上市运行不同阶段的交易保证金（万分数）
+const STAGE = { 挂牌: 500, 交割月前一月: 1000, 交割月: 1500, 最后交易日前二日: 2000 };
+// ===== 计算 =====
+const DAY = 86400000;
+function toDate(s) { const [y, m, d] = s.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d)); }
+function fmt(t) { return new Date(t).toISOString().slice(0, 10); }
+function isTradingDay(s) { const w = toDate(s).getUTCDay(); return w > 0 && w < 6 && !HOLIDAYS.includes(s); }
+function nextTradingDay(s) { let t = toDate(s).getTime(); do { t += DAY; } while (!isTradingDay(fmt(t))); return fmt(t); }
+function prevTradingDay(s) { let t = toDate(s).getTime(); do { t -= DAY; } while (!isTradingDay(fmt(t))); return fmt(t); }
+function firstTradingDayFrom(s) { return isTradingDay(s) ? s : nextTradingDay(s); }
+function product(c) { return c.slice(0, 2).toUpperCase(); }
+
+function stageOf(c, day) {
+  const y = 2000 + Number(c.slice(2, 4)), m = Number(c.slice(4, 6));
+  const mm = String(m).padStart(2, '0');
+  const prev = m === 1 ? `${y - 1}-12-01` : `${y}-${String(m - 1).padStart(2, '0')}-01`;
+  const last = firstTradingDayFrom(`${y}-${mm}-15`);
+  if (day >= prevTradingDay(prevTradingDay(last))) return ['最后交易日前二日', STAGE.最后交易日前二日];
+  if (day >= firstTradingDayFrom(`${y}-${mm}-01`)) return ['交割月', STAGE.交割月];
+  if (day >= firstTradingDayFrom(prev)) return ['交割月前一月', STAGE.交割月前一月];
+  return ['挂牌', STAGE.挂牌];
+}
+
+function covers(n, c) {
+  if (n.品种 !== product(c)) return false;
+  return !n.合约从 || (n.合约从 <= c && c <= n.合约到);
+}
+function latest(hits) { return hits.sort((a, b) => (a.生效日 < b.生效日 ? -1 : 1))[hits.length - 1]; }
+function pct(bp) { return (bp / 100) + '%'; }
+function money(cents) { return Math.floor(cents / 100) + '.' + String(cents % 100).padStart(2, '0'); }
+
+// 一笔委托属于哪个交易日：按日期算。
+function tradingDayOf(input) { return input.日期; }
+
+// 某个交易日在用的通知：取最新一份覆盖该合约的通知。通知生效日的第二天起用新参数。
+function noticeOn(c, day) { return latest(NOTICES.filter(n => covers(n, c) && n.生效日 < day)); }
+function noticeForTrading(c, day) { return noticeOn(c, day); }
+function noticeForSettlement(c, day) { return noticeOn(c, day); }
+
+// 一般持仓保证金比例：通知点名的合约，以通知为准；其他合约和阶段标准比，取高的。
+function generalRatio(n, c, day) {
+  if (n.合约从) return [n.一般持仓, `${n.编号} 点名该合约，按通知 ${pct(n.一般持仓)}`];
+  const [s, bp] = stageOf(c, day);
+  return [Math.max(n.一般持仓, bp), `通知 ${pct(n.一般持仓)}，阶段标准（${s}）${pct(bp)}，取高的`];
+}
+
+function quote(input) {
+  const c = input.合约, spec = SPEC[product(c)], tick = spec.最小变动价位;
+  const out = { 过程: [] };
+  const day = tradingDayOf(input);
+  out.交易日 = day;
+  const nt = noticeForTrading(c, day);
+  const base = SETTLE[c][prevTradingDay(day)];
+  if (nt && base) {
+    const up = Math.floor(base * (10000 + nt.涨跌停板) / (tick * 10000)) * tick;
+    const dn = Math.ceil(base * (10000 - nt.涨跌停板) / (tick * 10000)) * tick;
+    Object.assign(out, { 幅度: nt.涨跌停板, 基准结算价: base, 涨停价: up, 跌停价: dn, 交易通知: nt.编号 });
+    out.过程.push(`交易日 ${day}，涨跌停板 ${pct(nt.涨跌停板)}（${nt.编号}）`,
+      `基准：上一交易日 ${prevTradingDay(day)} 结算价 ${base}`,
+      `涨停价 ${base} × ${(10000 + nt.涨跌停板) / 100}% 向下取到 ${tick} 的整数倍 = ${up}`,
+      `跌停价 ${base} × ${(10000 - nt.涨跌停板) / 100}% 向上取到 ${tick} 的整数倍 = ${dn}`);
+  }
+  const sd = input.日期;
+  const ns = noticeForSettlement(c, sd), px = SETTLE[c][sd];
+  if (ns && px && input.手数) {
+    const [bp, why] = input.类型 === '套保' ? [ns.套保持仓, `套保持仓按通知 ${pct(ns.套保持仓)}（${ns.编号}）`] : generalRatio(ns, c, sd);
+    const cents = Math.round(px * spec.交易单位 * input.手数 * bp / 100);
+    Object.assign(out, { 结算日: sd, 结算价: px, 保证金比例: bp, 保证金: money(cents), 结算通知: ns.编号 });
+    out.过程.push(`${sd} 收盘结算：${why}`,
+      `保证金 = ${px} × ${spec.交易单位} 吨 × ${input.手数} 手 × ${pct(bp)} = ${money(cents)} 元`);
+  }
+  return out;
+}
+// ===== 页面 =====
+
+function kv(k, v) { return `<div class="kv"><b>${k}</b><span>${v}</span></div>`; }
+function run() {
+  const input = { 合约: document.getElementById('c').value, 日期: document.getElementById('d').value,
+                  类型: document.getElementById('k').value, 手数: Number(document.getElementById('n').value) };
+  
+  let r;
+  try { r = quote(input); } catch (e) {
+    document.getElementById('lim').innerHTML = `<p class="err">${e.message}</p>`;
+    document.getElementById('mar').innerHTML = ''; document.getElementById('steps').innerHTML = ''; return;
+  }
+  document.getElementById('lim').innerHTML = r.涨停价 ? kv('交易日', r.交易日) + kv('涨跌停板幅度', pct(r.幅度)) +
+    kv('基准结算价', r.基准结算价) + kv('涨停价', r.涨停价) + kv('跌停价', r.跌停价) : '<p class="err">没有该交易日的基准结算价</p>';
+  document.getElementById('mar').innerHTML = r.保证金 ? kv('结算日', r.结算日) + kv('结算价', r.结算价) +
+    kv('保证金比例', pct(r.保证金比例)) + kv('交易保证金（元）', r.保证金) : '<p class="err">没有该日的结算价</p>';
+  document.getElementById('steps').innerHTML = r.过程.map(s => `<li>${s}</li>`).join('');
+}
+document.getElementById('nt').innerHTML = '<tr><th>编号</th><th>合约</th><th>生效</th><th>涨跌停</th><th>一般</th><th>套保</th></tr>' +
+  NOTICES.map(n => `<tr><td>${n.编号}</td><td>${n.合约从 ? n.合约从 + '—' + n.合约到 : '全部'}</td><td>${n.生效日}</td>` +
+    `<td>${pct(n.涨跌停板)}</td><td>${pct(n.一般持仓)}</td><td>${pct(n.套保持仓)}</td></tr>`).join('');
+document.getElementById('go').onclick = run;
+run();
+
+</script>
+</body></html>
