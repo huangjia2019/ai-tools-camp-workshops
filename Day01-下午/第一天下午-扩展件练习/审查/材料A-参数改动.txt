@@ -1,0 +1,5 @@
+notices.json  新增一条
++ {"id": "SHFE-2026-0630", "product": "CU",
++  "contracts": "CU2607—CU2702",
++  "limit": "9%", "general": "11%", "hedge": "10%",
++  "effective": "2026-07-02 收盘结算时起"}
