@@ -1,4 +1,0 @@
-query_service.py
-def positions(request, member_id):
-    sql = f"SELECT contract, long, short FROM positions WHERE member_id = '{member_id}'"
-    return db.execute(sql).fetchall()

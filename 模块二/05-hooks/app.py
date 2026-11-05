@@ -1,0 +1,1 @@
+LABEL = 'price calculator'

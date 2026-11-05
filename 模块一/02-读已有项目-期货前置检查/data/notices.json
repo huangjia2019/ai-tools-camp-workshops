@@ -1,0 +1,19 @@
+{
+  "_note": "交易所参数调整通知。每条写明生效时点：effective_after_settlement_of = D 表示“自 D 日收盘结算时起”。代码里不出现具体百分比，参数只在这里改。",
+  "notices": [
+    {
+      "id": "BASE-2026H1",
+      "title": "2026 年上半年执行的铜期货参数（练习基线）",
+      "published": "2026-01-22",
+      "effective_after_settlement_of": "2026-01-22",
+      "source": "公开报道称上期所 2026 年 1 月通知将铜期货涨跌停板调为 8%、一般持仓保证金 10%、套保持仓 9%。确切生效日以交易所原文为准，练习只把它当作 7 月以前的现行值。",
+      "changes": {
+        "CU": {
+          "limit_pct": "0.08",
+          "margin_general": "0.10",
+          "margin_hedge": "0.09"
+        }
+      }
+    }
+  ]
+}

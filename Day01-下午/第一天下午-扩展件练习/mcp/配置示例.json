@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "xm-lab": {
-      "command": "python",
-      "args": ["把这里换成 xm_lab_server.py 的完整路径"]
-    }
-  }
-}

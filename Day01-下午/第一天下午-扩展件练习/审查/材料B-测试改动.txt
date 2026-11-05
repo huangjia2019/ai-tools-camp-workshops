@@ -1,9 +1,0 @@
-test_params.py
-- assert limit_of("CU2608", "2026-06-15") == "8%"
-+ assert limit_of("CU2608", "2026-06-15") == "9%"
-- assert limit_of("CU2608", "2026-07-03") == "8%"
-+ assert limit_of("CU2608", "2026-07-03") == "9%"
-
-+ def test_margin_cu2607_0703():
-+     # 期望值：运行结果
-+     assert margin("CU2607", "2026-07-03", price=80000, lots=1) == 44000
