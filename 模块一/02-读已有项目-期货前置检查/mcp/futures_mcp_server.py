@@ -30,7 +30,7 @@ TOOLS = [
                      'required': ['contract', 'trading_day']}},
     {'name': 'get_limit_prices', 'description': '查某合约在某交易日的涨停价与跌停价（按上一交易日结算价计算）。',
      'inputSchema': {'type': 'object', 'properties': {'contract': CONTRACT, 'trading_day': DAY}, 'required': ['contract', 'trading_day']}},
-    {'name': 'get_settle_price', 'description': '查某合约某交易日的结算价（教学数值）。',
+    {'name': 'get_settle_price', 'description': '查某合约某交易日的结算价。',
      'inputSchema': {'type': 'object', 'properties': {'contract': CONTRACT, 'trading_day': DAY}, 'required': ['contract', 'trading_day']}},
 ]
 

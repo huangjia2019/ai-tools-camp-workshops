@@ -1,4 +1,4 @@
-"""练习用的 Hook：不让智能体改 tests/ 和 .trae/ 下的文件。
+"""Hook：不让智能体改 tests/ 和 .trae/ 下的文件。
 
 PreToolUse 收到 Write、Edit 时按目标路径判断；RunCommand（终端）在这个练习里一律拒绝，免得用命令绕过。
 TRAE 文档没有写 Write、Edit 的 tool_input 里路径放在哪个字段，所以先找常见字段名，找不到再找像路径的字符串。

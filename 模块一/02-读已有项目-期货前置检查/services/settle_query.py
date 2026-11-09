@@ -1,4 +1,4 @@
-"""结算查询服务：按会员查持仓与结算结果（练习代码，勿用于生产）。"""
+"""结算查询服务：按会员查持仓与结算结果。"""
 from __future__ import annotations
 
 import sqlite3

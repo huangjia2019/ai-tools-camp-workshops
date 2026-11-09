@@ -1,10 +1,10 @@
 # 05 Hooks：文件修改权限检查
 
-用 Qoder CN 或 TRAE 打开本文件夹（菜单“文件 → 打开文件夹”），只打开这一个文件夹；问是否信任作者时选信任。Hook 只在信任的文件夹里执行。
+Hook 只在信任的文件夹里执行。
 
 | 文件 | 内容 |
 |---|---|
-| app.py | 练习用的小程序 |
+| app.py | 一个小程序，只有 LABEL 一个字符串 |
 | tests/ | 测试，期望值由人维护，智能体不许改 |
 | .trae/hooks/protect_tests.py、configure.py、test_guard.py | TRAE 用的检查脚本、配置脚本和自测 |
 | guard.py、configure_qoder.py、test_qoder_guard.py | Qoder CN 用的检查脚本、配置脚本和自测 |

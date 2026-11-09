@@ -1,4 +1,4 @@
-"""练习用计算脚本：涨跌停价、交易保证金、参数文件核对。练习数据，虚构，不代表任何交易所的规定。
+"""计算脚本：涨跌停价、交易保证金、参数文件核对。
 
 在 模板/ 目录下运行（Windows 把 python3 换成 python）：
     python3 scripts/calc.py limit --base 23450 --pct 7 --tick 5
@@ -101,7 +101,7 @@ def verify(path):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description='练习用计算脚本（练习数据，虚构）')
+    ap = argparse.ArgumentParser(description='涨跌停价、交易保证金与参数文件核对')
     sub = ap.add_subparsers(dest='cmd', required=True)
     a = sub.add_parser('limit', help='涨跌停价')
     a.add_argument('--base', required=True, help='基准价（上一交易日结算价）')

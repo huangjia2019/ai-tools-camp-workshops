@@ -45,12 +45,12 @@ footer { max-width: 1080px; margin: 0 auto 30px; padding: 0 20px; color: var(--g
     <div class="card" style="margin-top:16px"><h2>在用的参数通知</h2><table id="nt"></table></div>
   </section>
 </main>
-<footer>v1.0　结算价与持仓为教学数值；规则以交易所现行文本为准。参数只在代码顶部的“数据”区修改。</footer>
+<footer>v1.0　参数只在代码顶部的“数据”区修改。</footer>
 <script>
 // ===== 数据：参数只在这里改 =====
 const SPEC = { CU: { 名称: '阴极铜', 交易单位: 5, 最小变动价位: 10 } };   // 5 吨/手，10 元/吨
 
-// 结算价（教学数值，不是真实行情），元/吨
+// 结算价，元/吨
 const SETTLE = {
   "CU2607": {
     "2026-06-26": 78050,

@@ -1,4 +1,4 @@
-"""结算价查询（教学数值）。"""
+"""结算价查询。"""
 from __future__ import annotations
 
 from datetime import date

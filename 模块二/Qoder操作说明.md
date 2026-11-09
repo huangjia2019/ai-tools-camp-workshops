@@ -1,6 +1,6 @@
 # Qoder CN IDE 练习说明
 
-练习在本目录的六个文件夹里（01-rules 到 06-testing），每次打开对应的文件夹。只使用课程材料，不连接真实交易系统。Windows 命令中的 `python3` 可换成 `python`。
+Windows 命令中的 `python3` 换成 `python`。
 
 ## 开始之前
 
@@ -62,4 +62,4 @@ Qoder 传给 Hook 的编辑工具名是 `SearchReplace`。配置里的 matcher �
 
 ## 版本参考
 
-以上步骤在 2026-11-04 用 Qoder CN IDE 1.34.0（基于 VS Code 1.106.3）实测。在设置页或用内置技能新建的规则、技能、子智能体、指令写在项目的 `.qoder/` 下；本练习提供的 `.lingma/` 下的文件同样会被读取。官方说明见 [Qoder CN IDE 文档](https://docs.qoder.cn/user-guide/rules)，Skills、子智能体和 Hooks 分别参见同站的 `skills`、`custom-agent`、`hooks` 页面。
+以上步骤在 2026-11-04 用 Qoder CN IDE 1.34.0（基于 VS Code 1.106.3）实测，2026-11-09 用 1.38.0 复测，入口和写法相同。1.38.0 打开每个新文件夹都会先弹“为此项目建立代码库索引？”，选“建立索引”或“暂不建立”以后才能在会话里输入。在设置页或用内置技能新建的规则、技能、子智能体、指令写在项目的 `.qoder/` 下；本练习提供的 `.lingma/` 下的文件同样会被读取。官方说明见 [Qoder CN IDE 文档](https://docs.qoder.cn/user-guide/rules)，Skills、子智能体和 Hooks 分别参见同站的 `skills`、`custom-agent`、`hooks` 页面。
